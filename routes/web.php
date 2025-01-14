@@ -3,20 +3,20 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return jsonResponse(true, 'Response berhasil', null, 200);
+    return jsonResponse(true, 'Response  Success', null, 200);
 });
 
 // code 200 
-// return response()->json([
+// ret       urn response()->json([
 //     'success' => true,
-//     'message' => 'Response berhasil',
+//     'message' => 'Response  Success',
 //     'data' => null
 // ]);
 
 // code 400
 // {
 //     "success": false,
-//     "message": "Bad Request",
+//     "message": "Bad Response",
 //     "errors": {
 //         "field": "This field is required"
 //     }
@@ -25,6 +25,6 @@ Route::get('/', function () {
 // code 404
 // return response()->json([
 //     'success' => false,
-//     'message' => 'Data tidak ditemukan',
+//     'message' => 'Data Not Found',
 //     'data'    => null
 // ], 404); 
