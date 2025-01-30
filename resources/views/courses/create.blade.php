@@ -10,11 +10,10 @@
 <body>
     <h1>Create Course</h1>
     <form id="create-course-form">
+        <input type="hidden" id="category_id" name="category_id" value="{{ $category_id }}">
+
         <label for="title">Title:</label><br>
         <input type="text" id="title" name="title" required><br><br>
-
-        <label for="category_id">Category:</label><br>
-        <input type="number" id="category_id" name="category_id" required><br><br>
 
         <label for="description">Description:</label><br>
         <textarea id="description" name="description"></textarea><br><br>
@@ -33,17 +32,18 @@
             e.preventDefault();
             var formData = {
                 title: $('#title').val(),
-                category_id: $('#category_id').val(),
+                category_id: $('#category_id').val(), 
                 description: $('#description').val()
             };
 
             $.ajax({
-                url: '/courses', 
+                url: '/api/courses', 
                 type: 'POST',
                 data: formData,
                 success: function(response) {
                     alert(response.message);
                     console.log(response.data);
+                    return view('courses.index');
                 },
                 error: function(xhr, status, error) {
                     alert('Error: ' + error);

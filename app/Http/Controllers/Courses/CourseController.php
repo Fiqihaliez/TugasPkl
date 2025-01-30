@@ -10,10 +10,20 @@ use Illuminate\Support\Facades\Auth;
 class CourseController extends Controller
 {
 
-    public function create()
-    {
-        return view('courses.create');
-    }
+    public function index($category_id)
+{
+    $courses = Course::where('category_id', $category_id)->get();
+
+    return view('courses.index', [
+        'courses' => $courses,
+        'category_id' => $category_id, 
+    ]);;
+}
+
+public function create($category_id)
+{
+    return view('courses.create', ['category_id' => $category_id]);
+}
 
     public function edit($id)
     {
@@ -23,8 +33,8 @@ class CourseController extends Controller
 
     public function show($id)
     {
-        $course = Course::findOrFail($id);
-        return view('courses.show', compact('course'));
+        $data['course'] = Course::findOrFail($id);
+        return view('courses.show', $data);
     }
 }
 
