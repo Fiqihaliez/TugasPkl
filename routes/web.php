@@ -1,10 +1,17 @@
 <?php
 
+use App\Models\Course;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Courses\CourseController;
+use PhpParser\Node\Stmt\TryCatch;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Category\CategoryController;
 use App\Http\Controllers\Category\CategoryApiController;
 use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Courses\ApiCourseController;
 
 Route::get('/', function () {
     return jsonResponse(true, 'Response  Success', null, 200);
@@ -21,6 +28,16 @@ Route::resource('categories', CategoryController::class);
 Route::prefix('api')->group(function () {
     Route::resource('categories', CategoryApiController::class);
 });
+
+Route::prefix('api')->group(function () {
+    Route::resource('courses', ApiCourseController::class);
+});
+
+Route::get('/courses/category/{category_id}', [CourseController::class, 'index'])->name('courses.index');
+Route::get('/courses/create/{category_id}', [CourseController::class, 'create'])->name('courses.create');
+Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
+Route::get('/courses/{id}/edit', [CourseController::class, 'edit'])->name('courses.edit');
+
 
 
 // code 200 

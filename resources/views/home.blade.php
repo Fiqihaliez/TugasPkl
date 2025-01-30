@@ -16,7 +16,7 @@
                 <div class="bg-white shadow rounded-lg p-4 hover:shadow-lg transition">
                     <h3 class="text-lg font-semibold mb-2">{{ $category->name }}</h3>
                     <p class="text-gray-600 mb-4">{{ $category->description }}</p>
-                    <a href="{{ route('categories.show', $category->id) }}" class="text-blue-500 hover:underline">Explore</a>
+                    <a href="{{ route('courses.index', ['category_id' => $category->id]) }}" class="text-blue-500 hover:underline">Explore</a>
                 </div>
             @endforeach
         </div>
