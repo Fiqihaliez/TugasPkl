@@ -1,21 +1,18 @@
 <nav class="bg-white shadow-md">
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-        <div class="text-xl font-semibold text-blue-500">
-            <a href="/">My App</a>
-        </div>
-
-        <div class="hidden md:flex space-x-6">
-            <a href="home" class="text-gray-700 hover:text-blue-500">Home</a>
-            <a href="categories" class="text-gray-700 hover:text-blue-500">Categories</a>
+        <div class="text-xl font-semibold text-blue-500 hidden md:flex space-x-10">
+            <a href="/"><i class="fa-brands fa-figma"></i> My App</a>
+            <a href="home" class="text-gray-700 hover:text-blue-500"><i class="fa-solid fa-house"></i> Home</a>
+            <a href="categories" class="text-gray-700 hover:text-blue-500"><i class="fa-solid fa-envelope"></i> Categories</a>
             <a href="courses" class="text-gray-700 hover:text-blue-500">Courses</a>
         </div>
 
-        <div class="hidden md:flex items-center space-x-4">
+        <div class="hidden md:flex items-center space-x-8">
             @auth
                 <span class="text-gray-700">Welcome, {{ Auth::user()->name }}</span>
             @else
-                <a href="{{ route('login') }}" class="text-gray-700 hover:text-blue-500">Login</a>
-                <a href="{{ route('register') }}" class="text-gray-700 hover:text-blue-500">Register</a>
+                {{-- <a href="{{ route('login') }}" class="text-gray-700 hover:text-blue-500">Login</a>
+                <a href="{{ route('register') }}" class="bg-blue-200 p-2  text-gray-700 hover:text-blue-500">Register</a> --}}
             @endauth
         </div>
         <button class="md:hidden text-gray-700 focus:outline-none" id="mobile-menu-button" aria-label="Toggle Sidebar">
@@ -38,7 +35,7 @@
         <div class="space-y-4">
             <a href="home" class="block text-gray-700 hover:text-blue-500">Home</a>
             <a href="categories" class="block text-gray-700 hover:text-blue-500">Categories</a>
-            <a href="courses" class="block text-gray-700 hover:text-blue-500">Courses</a>
+            <a href="courses" class="block text-gray-700 hover:text-blue-500 ">Courses</a>
         </div>
 
         <div class="mt-6 border-t pt-4">
@@ -101,4 +98,15 @@
             }
         });
     }
+
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll('.nav-link');
+    
+    navLinks.forEach(link => {
+      if (link.getAttribute('href') === currentPath) {
+        link.classList.add('text-blue-500'); // Menambahkan kelas biru
+      } else {
+        link.classList.remove('text-blue-500');
+      }
+    });
 </script>
