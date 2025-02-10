@@ -13,10 +13,6 @@ use App\Http\Controllers\Category\CategoryApiController;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Courses\ApiCourseController;
 
-Route::get('/', function () {
-    return jsonResponse(true, 'Response  Success', null, 200);
-});
-
 Route::post('register', [AuthController::class, 'register'])->name('register');
 Route::view('register', 'auth.register')->name('register.form'); 
 
@@ -27,17 +23,24 @@ Route::resource('categories', CategoryController::class);
 
 Route::prefix('api')->group(function () {
     Route::resource('categories', CategoryApiController::class);
+}); 
+
+Route::prefix('api')->as('api.')->group(function () {
+    Route::post('/courses', [ApiCourseController::class, 'store'])->name('courses.store');  
+    Route::put('/courses/{courseId}', [ApiCourseController::class, 'update'])->name('courses.update');  
+    Route::delete('/courses/{courseId}', [ApiCourseController::class, 'destroy'])->name('courses.destroy');
+    Route::get('/courses/{category_id?}', [ApiCourseController::class, 'index'])->name('courses.index');
+    Route::get('/', [ApiCourseController::class, 'landing'])->name('landing.index');
 });
 
-Route::prefix('api')->group(function () {
-    Route::resource('courses', ApiCourseController::class);
+Route::group([], function () {
+    Route::get('/', [CourseController::class, 'landing']);
+    Route::get('/courses/{category_id}', [CourseController::class, 'index'])->name('courses.index');
+    Route::get('/courses/create/{category_id}', [CourseController::class, 'create'])->name('courses.create');
+    Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
+    Route::get('/courses/{id}/edit', [CourseController::class, 'edit'])->name('courses.edit');
+    Route::get('/courses', [CourseController::class, 'allCourses'])->name('courses.all');
 });
-
-Route::get('/courses/category/{category_id}', [CourseController::class, 'index'])->name('courses.index');
-Route::get('/courses/create/{category_id}', [CourseController::class, 'create'])->name('courses.create');
-Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
-Route::get('/courses/{id}/edit', [CourseController::class, 'edit'])->name('courses.edit');
-
 
 
 // code 200 

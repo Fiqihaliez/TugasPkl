@@ -3,27 +3,38 @@
 namespace App\Http\Controllers\Courses;
 use App\Models\Course;
 use App\Models\Category;
+use App\Services\CourseService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class CourseController extends Controller
 {
-
+    public function landing()
+{
+    return view('landing');
+}
+    public function allCourses()
+    {
+      return view('courses.index');  
+    }
     public function index($category_id)
 {
-    $courses = Course::where('category_id', $category_id)->get();
-
     return view('courses.index', [
-        'courses' => $courses,
-        'category_id' => $category_id, 
-    ]);;
+        'category_id' => $category_id,
+    ]);
 }
 
-public function create($category_id)
+    public function create($category_id)
 {
-    return view('courses.create', ['category_id' => $category_id]);
+    $categories = Category::all();
+
+    return view('courses.create', [
+        'categories' => $categories, 
+        'category_id' => $category_id 
+    ]);
 }
+
 
     public function edit($id)
     {
@@ -37,4 +48,3 @@ public function create($category_id)
         return view('courses.show', $data);
     }
 }
-
