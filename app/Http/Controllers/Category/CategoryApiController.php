@@ -3,12 +3,18 @@
 namespace App\Http\Controllers\Category;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Category;
-
+use App\Services\CategoryService;
+use Illuminate\Http\Request;
 
 class CategoryApiController extends Controller
 {
+    protected $categoryService;
+
+    public function __construct(CategoryService $categoryService)
+    {
+        $this->categoryService = $categoryService;
+    }
 
     public function store(Request $request)
     {
@@ -17,16 +23,15 @@ class CategoryApiController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $category = Category::create([
-            'name' => $request->input('name'),
-            'description' => $request->input('description'),
-        ]);
+        $category = $this->categoryService->createCategory($request->all());
 
         return response()->json([
             'success' => true,
             'message' => 'Category created successfully.',
             'data' => $category
         ], 201);
+
+        redirect()->route('categories.index')->with('success', 'Category created successfully.');
     }
 
     public function update(Request $request, Category $category)
@@ -35,26 +40,26 @@ class CategoryApiController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
-
-        $category->update([
-            'name' => $request->input('name'),
-            'description' => $request->input('description'),
-        ]);
-
+    
+        $category = $this->categoryService->updateCategory($category, $request->all());
+    
         return response()->json([
             'success' => true,
             'message' => 'Category updated successfully.',
             'data' => $category
         ]);
     }
+    
 
     public function destroy(Category $category)
     {
-        $category->delete();
+        $this->categoryService->deleteCategory($category);
 
         return response()->json([
             'success' => true,
             'message' => 'Category deleted successfully.'
         ]);
+        redirect()->route('categories.index')->with('success', 'Category delete successfully.');
     }
 }
+

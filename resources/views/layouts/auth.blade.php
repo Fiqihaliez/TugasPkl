@@ -10,8 +10,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
-<body class="bg-gray-100">
-    @include('components.navbar')
+<body class="bg-blue-300">
 
     <div class="container mx-auto p-8">
         @yield('content')

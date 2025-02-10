@@ -11,9 +11,9 @@
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 </head>
 <body class="bg-gray-100">
-    @include('components.navbar')
+    @include('components.navbar1')
 
-    <div class="container mx-auto p-8">
+    <div class="container mx-auto">
         @yield('content')
     </div>
 
