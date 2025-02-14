@@ -10,13 +10,5 @@
 
     <p><strong>Category:</strong> {{ $course->category->name }}</p>
     <p><strong>Description:</strong> {{ $course->description }}</p>
-
-    <a href="/courses/{{ $course->id }}/edit">Edit</a>
-
-    <form method="POST" action="/api/courses/{{ $course->id }}" style="display:inline;">
-        @csrf
-        @method('DELETE')
-        <button type="submit">Delete Course</button>
-    </form>
 </body>
 </html>

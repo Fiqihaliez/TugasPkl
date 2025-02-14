@@ -3,38 +3,60 @@
 namespace App\Http\Controllers\Courses;
 use App\Models\Course;
 use App\Models\Category;
+use App\Services\CourseService;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class CourseController extends Controller
 {
+    protected $courseService;
 
-    public function index($category_id)
-{
-    $courses = Course::where('category_id', $category_id)->get();
+    public function __construct(CourseService $courseService)
+    {
+        $this->courseService = $courseService;
+    }
 
-    return view('courses.index', [
-        'courses' => $courses,
-        'category_id' => $category_id, 
-    ]);;
-}
+    public function landing()
+    {
+        return view('landing');
+    }
 
-public function create($category_id)
-{
-    return view('courses.create', ['category_id' => $category_id]);
-}
+    public function allCourses()
+    {
+        return view('courses.index');
+    }
+
+    public function index($category_id = null)
+    {
+        return view('courses.index', [
+            'category_id' => $category_id,
+        ]);
+    }
+
+    public function create($category_id)
+    {
+        $categories = Category::all();
+
+        return view('courses.create', [
+            'categories' => $categories, 
+            'category_id' => $category_id 
+        ]);
+    }
 
     public function edit($id)
     {
-        $data['course'] = Course::findOrFail($id);
-        return view('courses.edit', $data);
+        $course = $this->courseService->getCourses(null, null, null)->find($id);
+        return view('courses.edit', [
+            'course' => $course
+        ]);
     }
 
     public function show($id)
     {
-        $data['course'] = Course::findOrFail($id);
-        return view('courses.show', $data);
+        $course = $this->courseService->getCourses(null, null, null)->find($id);
+        return view('courses.show', [
+            'course' => $course
+        ]);
     }
 }
-
