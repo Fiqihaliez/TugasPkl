@@ -5,22 +5,13 @@
             {{ request()->is('/') ? 'text-blue-500' : '' }}" ><i class="fa-solid fa-book"></i> My App</a>
         </div>
 
-        <div class="hidden md:flex space-x-6">
-            <a href="home" class="text-gray-700 hover:text-blue-500 
+        <div class="lg:pr-[450px] hidden md:flex space-x-6">
+            <a href="/home" class="text-gray-700 hover:text-blue-500 
                 {{ request()->is('home') ? 'text-blue-500' : '' }}"><i class="fa-solid fa-house"></i> Home</a>
-            <a href="categories" class="text-gray-700 hover:text-blue-500 
+            <a href="/categories" class="text-gray-700 hover:text-blue-500 
                 {{ request()->is('categories') ? 'text-blue-500' : '' }}"><i class="fa-solid fa-bars"></i> Categories</a>
-            <a href="courses" class="text-gray-700 hover:text-blue-500 
+            <a href="/courses" class="text-gray-700 hover:text-blue-500 
                 {{ request()->is('courses') ? 'text-blue-500' : '' }}"><i class="fa-solid fa-file"></i> Courses</a>
-        </div>
-
-        <div class="hidden md:flex items-center space-x-4">
-            @auth
-                <span class="text-gray-700">Welcome, {{ Auth::user()->name }}</span>
-            @else
-                <a href="{{ route('login') }}" class="text-gray-700 hover:text-blue-500">Login</a>
-                <a href="{{ route('register') }}" class="text-gray-700 hover:text-blue-500">Register</a>
-            @endauth
         </div>
 
         <button class="md:hidden text-gray-700 focus:outline-none" id="mobile-menu-button" aria-label="Toggle Sidebar">
@@ -42,35 +33,19 @@
             <a href="categories" class="block text-gray-700 hover:text-blue-500 {{ request()->is('categories') ? 'text-blue-500' : '' }}">Categories</a>
             <a href="courses" class="block text-gray-700 hover:text-blue-500 {{ request()->is('courses') ? 'text-blue-500' : '' }}">Courses</a>
         </div>
-
-        <div class="mt-6 border-t pt-4">
-            <button class="block bg-yellow-500 hover:text-yellow-700 mt-2" id="editButton" onclick="editItem()">Edit Item</button>
-            <button class="block bg-red-500 hover:text-red-700 mt-2" id="deleteButton" onclick="deleteItem()">Delete Item</button>
-        </div>
-
-        <div class="mt-6 border-t pt-4">
-            @auth
-                <span class="block text-gray-700">Welcome, {{ Auth::user()->name }}</span>
-            @else
-                <a href="{{ route('login') }}" class="block text-gray-700 hover:text-blue-500">Login</a>
-                <a href="{{ route('register') }}" class="block text-gray-700 hover:text-blue-500 mt-2">Register</a>
-            @endauth
-        </div>
     </div>
 </div>
 
 <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40" aria-hidden="true"></div>
 
-<div id="sidebar" class="fixed top-0 left-0 w-64 h-full bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out z-50">
-    <div class="px-4 py-6">
-        <div class="text-lg font-semibold text-blue-500 mb-6">
-            <a href="/">MyApp</a>
-        </div>
+<script>
+    document.getElementById("mobile-menu-button").addEventListener("click", function () {
+        document.getElementById("sidebar").classList.toggle("-translate-x-full");
+        document.getElementById("overlay").classList.toggle("hidden");
+    });
 
-        <div class="space-y-4">
-            <a href="home" class="block text-gray-700 hover:text-blue-500 {{ request()->is('home') ? 'text-blue-500' : '' }}">Home</a>
-            <a href="categories" class="block text-gray-700 hover:text-blue-500 {{ request()->is('categories') ? 'text-blue-500' : '' }}">Categories</a>
-            <a href="courses" class="block text-gray-700 hover:text-blue-500 {{ request()->is('courses') ? 'text-blue-500' : '' }}">Courses</a>
-        </div>
-    </div>
-</div>
+    document.getElementById("overlay").addEventListener("click", function () {
+        document.getElementById("sidebar").classList.add("-translate-x-full");
+        document.getElementById("overlay").classList.add("hidden");
+    });
+</script>

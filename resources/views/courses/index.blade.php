@@ -2,33 +2,34 @@
 @section('content')
 <div class="flex justify-between items-center">
     <div>
-        <h3 class="text-2xl">Courses</h3>
+        <h3 class="text-2xl pl-5 pt-2">Courses</h3>
         <br>
         @isset($category_id)
-        <a href="{{ route('home') }}" class="text-blue-500"><= Back To Categories</a>
+        <a href="{{ route('home') }}" class="text-blue-500 pl-5 text-lg"><= Back</a>
         @endisset
     </div>
-    <div class="text-right w-full">
+    <div class="text-right w-full pr-5">
         @isset($category_id)
-            <a href="{{ route('courses.create', ['category_id' => $category_id]) }}" class="btn btn-primary text-xl bg-blue-300 p-1">Create Course</a>
+            <a href="{{ route('courses.create', ['category_id' => $category_id]) }}" class="btn btn-primary text-xl rounded-md bg-blue-300 p-1">Create Course</a>
         @endisset
     </div>
 </div>
 <br>
-<div id="course-list" class="grid grid-cols-4 gap-10"></div>
+<div id="course-list" class="pl-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10"></div>
+
 <script>
     var categoryId = {{ $category_id ?? 'null' }};
-    var url = '/api/courses';
+    var url = '/api/courses'; 
     $.ajaxSetup({
         headers: {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         }
     });
-    
+
     if (categoryId) {
         url = '/api/courses/' + categoryId; 
     }
-    
+
     $.ajax({
         url: url, 
         type: 'GET',
@@ -45,19 +46,19 @@
             $.each(response, function(index, course) {
                 var courseHtml = `
                     <div class="course-item bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition">
-                                <img src="${course.image}" class="w-full h-48 object-cover">
-                                <div class="p-4">
-                                    <h3 class="text-lg font-semibold mb-2">${course.title}</h3>
-                                    <p class="text-gray-600 mb-4">${course.description}</p>
-                                    @isset($category_id)
-                                    <a href="/courses/${course.id}" class="btn btn-info">Show</a>
-                                    <a href="/courses/${course.id}/edit" class="btn btn-warning">Edit</a>
-                                    <button class="btn btn-danger" onclick="deleteCourse(${course.id})">Delete</button>
-                                @else
-                                    <a href="/courses/${course.id}" class="btn btn-info">Show</a>
-                                @endisset
-                                        </div>
-                                    </div>
+                        <img src="${course.image}" class="w-full h-48 object-cover">
+                        <div class="p-4">
+                            <h3 class="text-lg font-semibold mb-2">${course.title}</h3>
+                            <p class="text-gray-600 mb-4">${course.description}</p>
+                            @isset($category_id)
+                                <a href="/courses/${course.id}" class="btn btn-info text-white bg-blue-500 hover:bg-blue-700 py-1 px-3 rounded-md">Show</a>
+                                <a href="/courses/${course.id}/edit" class="btn btn-warning text-white bg-yellow-500 hover:bg-yellow-700 py-1 px-3 rounded-md">Edit</a>
+                                <button class="btn btn-danger text-white bg-red-500 hover:bg-red-700 py-1 px-3 rounded-md" onclick="deleteCourse(${course.id})">Delete</button>
+                            @else
+                                <a href="/courses/${course.id}" class="btn btn-info text-white bg-blue-500 hover:bg-blue-700 py-1 px-3 rounded-md">Show</a>
+                            @endisset
+                        </div>
+                    </div>
                 `;
                 courseList.append(courseHtml); 
             });

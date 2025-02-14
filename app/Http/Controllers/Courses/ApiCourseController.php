@@ -5,53 +5,31 @@ namespace App\Http\Controllers\Courses;
 use Exception;
 use App\Models\Course;
 use Illuminate\Http\Request;
+use App\Services\CourseService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class ApiCourseController extends Controller
 {
-    public function index($category_id = null)
-{
-    try {
-        $search = request()->query('search', '');
-        if ($category_id) {
-            $courses = Course::where('category_id', $category_id)
-                             ->where('title', 'like', '%' . $search . '%')
-                             ->get();
-            if ($courses->isEmpty()) {
-                return response()->json(['message' => 'Tidak ada kursus untuk kategori ini.'], 404);
-            }
-        } else{
-                $courses = Course::where('title', 'like', '%' . $search . '%')
-                                 ->orderBy('title')
-                                 ->get(); 
-            }
-        return response()->json($courses);
-    } catch (Exception $e) {
-        return response()->json([
-            'message' => 'Terjadi kesalahan saat mengambil data kursus.',
-            'error' => $e->getMessage()
-        ], 500);
-    }
-}
+    protected $courseService;
 
-public function landing($limit = 3)
-{
-    try {
-        $search = request()->query('search', '');
-        $courses = Course::where('title', 'like', '%' . $search . '%')
-                    ->orderBy('title')
-                    ->limit($limit)    
-                    ->get();   
-            
-        return response()->json($courses);
-    } catch (Exception $e) {
-        return response()->json([
-            'message' => 'Terjadi kesalahan saat mengambil data kursus.',
-            'error' => $e->getMessage()
-        ], 500);
+    public function __construct(CourseService $courseService)
+    {
+        $this->courseService = $courseService;
     }
-}
+
+    public function index(Request $request, $category_id = null)
+    {
+         $search = request()->query('search', '');
+        $limit = isset($request->limit)? $request->limit : null; //Mengecek apakah ada limit yang di request
+        $courses = $this->courseService->getCourses($search, $category_id, $limit);  // Panggil fungsi di service
+
+        if ($courses->isEmpty()) {
+            return response()->json(['message' => 'Tidak ada kursus untuk kategori ini.'], 404);
+        }
+
+        return response()->json($courses);
+    }
 
     public function store(Request $request)
     {
@@ -61,53 +39,55 @@ public function landing($limit = 3)
             'category_id' => 'required|exists:categories,id',
         ]);
 
-        $course = new Course;
-        $course->title = $request->title;
-        $course->category_id = $request->category_id;
-        $course->description = $request->description;
-        $course->save();
-
-        return response()->json([
-            'message' => 'Course created successfully.',
-            'data' => $course,
-        ], 201);
+        try {
+            $course = $this->courseService->createCourse($request->all());
+            return response()->json([
+                'message' => 'Course created successfully.',
+                'data' => $course,
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat membuat kursus.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function update(Request $request, $id)
     {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'category_id' => 'required|exists:categories,id',
+            'description' => 'nullable|string',
+        ]);
+
         try {
-            $request->validate([
-                'title' => 'required|string|max:255',
-                'category_id' => 'required|exists:categories,id',
-                'description' => 'nullable|string',
-            ]);
-
-            $course = Course::findOrFail($id);
-            $course->title = $request->title;
-            $course->category_id = $request->category_id;
-            $course->description = $request->description;
-            $course->save();
-
+            $course = $this->courseService->updateCourse($id, $request->all());
             return response()->json([
                 'message' => 'Course updated successfully.',
                 'data' => $course,
             ]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'There is no Course to be updated',
-            ], 404);
+                'message' => 'Terjadi kesalahan saat memperbarui kursus.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
     public function destroy($courseId)
-{
-    $course = Course::find($courseId);
-
-    if ($course) {
-        $course->delete();
-        return response()->json(['message' => 'Course deleted successfully.']);
+    {
+        try {
+            $deleted = $this->courseService->deleteCourse($courseId);
+            if ($deleted) {
+                return response()->json(['message' => 'Course deleted successfully.']);
+            }
+            return response()->json(['message' => 'Course not found.'], 404);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Terjadi kesalahan saat menghapus kursus.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
-
-    return response()->json(['message' => 'Course not found.'], 404);
-}
-}
+}       

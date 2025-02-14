@@ -23,7 +23,7 @@ Route::resource('categories', CategoryController::class);
 
 Route::prefix('api')->group(function () {
     Route::resource('categories', CategoryApiController::class);
-}); 
+});
 
 Route::prefix('api')->as('api.')->group(function () {
     Route::post('/courses', [ApiCourseController::class, 'store'])->name('courses.store');  

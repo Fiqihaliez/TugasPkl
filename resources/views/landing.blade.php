@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto px-4 py-8">
+<div class="">
     @auth
         <h1 class="text-2xl font-bold mb-4">Welcome, {{ Auth::user()->name }}!</h1>
     @else
@@ -23,10 +23,11 @@
         </div>
     @endauth
         <br>
-    <label for="category-search" class="font-semibold"><i class="fa-solid fa-magnifying-glass"></i> Search Courses:</label>
-    <input type="text" id="category-search" class="border border-gray-300 rounded-md w-full p-2 mt-3" placeholder="Search for courses..." />
-
-    <div id="course-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-6"></div>
+        <div class="px-4">
+            <label for="category-search" class="font-semibold "><i class="fa-solid fa-magnifying-glass"></i> Search Courses:</label>
+            <input type="text" id="category-search" class="border border-gray-300 rounded-md w-full p-2 mt-3" placeholder="Search for courses..." />
+            <div id="course-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-6"></div>
+        </div>
 </div>
 
 <script>
@@ -34,9 +35,9 @@
         let debounceTimer;
         function fetchCourses(query = '') {
             $.ajax({
-                url: '/api/',
+                url: '/api/courses',
                 type: 'GET',
-                data: { search: query }, 
+                data: { search: query , limit : 3}, 
                 success: function(response) {
                     var courseList = $('#course-list');
                     courseList.empty(); 
