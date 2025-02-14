@@ -48,7 +48,7 @@
                                 <div class="p-4">
                                     <h3 class="text-lg font-semibold mb-2">${course.title}</h3>
                                     <p class="text-gray-600 mb-4">${course.description}</p>
-                                    <a href="/courses/${course.id}" class="text-blue-500 hover:underline">Start Learning</a>
+                                    <a href="/courses/${course.id}/show" class="text-blue-500 hover:underline">Start Learning</a>
                                 </div>
                             </div>
                         `;

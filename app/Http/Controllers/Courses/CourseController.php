@@ -27,7 +27,7 @@ class CourseController extends Controller
         return view('courses.index');
     }
 
-    public function index($category_id)
+    public function index($category_id = null)
     {
         return view('courses.index', [
             'category_id' => $category_id,

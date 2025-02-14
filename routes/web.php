@@ -23,24 +23,23 @@ Route::resource('categories', CategoryController::class);
 
 Route::prefix('api')->group(function () {
     Route::resource('categories', CategoryApiController::class);
-});
+}); 
 
 Route::prefix('api')->as('api.')->group(function () {
     Route::post('/courses', [ApiCourseController::class, 'store'])->name('courses.store');  
     Route::put('/courses/{courseId}', [ApiCourseController::class, 'update'])->name('courses.update');  
     Route::delete('/courses/{courseId}', [ApiCourseController::class, 'destroy'])->name('courses.destroy');
     Route::get('/courses/{category_id?}', [ApiCourseController::class, 'index'])->name('courses.index');
-    Route::get('/', [ApiCourseController::class, 'landing'])->name('landing.index');
 });
-
+ 
 Route::group([], function () {
     Route::get('/', [CourseController::class, 'landing']);
-    Route::get('/courses/{category_id}', [CourseController::class, 'index'])->name('courses.index');
+    Route::get('/courses/{category_id?}', [CourseController::class, 'index'])->name('courses.index');
     Route::get('/courses/create/{category_id}', [CourseController::class, 'create'])->name('courses.create');
-    Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
+    Route::get('/courses/{id}/show', [CourseController::class, 'show'])->name('courses.show');
     Route::get('/courses/{id}/edit', [CourseController::class, 'edit'])->name('courses.edit');
-    Route::get('/courses', [CourseController::class, 'allCourses'])->name('courses.all');
 });
+
 
 
 // code 200 

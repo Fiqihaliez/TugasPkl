@@ -29,9 +29,9 @@
         </div>
 
         <div class="space-y-4">
-            <a href="home" class="block text-gray-700 hover:text-blue-500 {{ request()->is('home') ? 'text-blue-500' : '' }}">Home</a>
-            <a href="categories" class="block text-gray-700 hover:text-blue-500 {{ request()->is('categories') ? 'text-blue-500' : '' }}">Categories</a>
-            <a href="courses" class="block text-gray-700 hover:text-blue-500 {{ request()->is('courses') ? 'text-blue-500' : '' }}">Courses</a>
+            <a href="/home" class="block text-gray-700 hover:text-blue-500 {{ request()->is('home') ? 'text-blue-500' : '' }}">Home</a>
+            <a href="/categories" class="block text-gray-700 hover:text-blue-500 {{ request()->is('categories') ? 'text-blue-500' : '' }}">Categories</a>
+            <a href="/courses" class="block text-gray-700 hover:text-blue-500 {{ request()->is('courses') ? 'text-blue-500' : '' }}">Courses</a>
         </div>
     </div>
 </div>

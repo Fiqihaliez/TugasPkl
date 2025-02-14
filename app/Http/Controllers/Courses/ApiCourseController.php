@@ -21,8 +21,8 @@ class ApiCourseController extends Controller
     public function index(Request $request, $category_id = null)
     {
          $search = request()->query('search', '');
-        $limit = isset($request->limit)? $request->limit : null; //Mengecek apakah ada limit yang di request
-        $courses = $this->courseService->getCourses($search, $category_id, $limit);  // Panggil fungsi di service
+        $limit = isset($request->limit)? $request->limit : null; 
+        $courses = $this->courseService->getCourses($search, $category_id, $limit);
 
         if ($courses->isEmpty()) {
             return response()->json(['message' => 'Tidak ada kursus untuk kategori ini.'], 404);
