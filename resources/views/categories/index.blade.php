@@ -2,123 +2,99 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    <h1 class="text-2xl font-bold mb-4">Categories</h1>
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold text-gray-800">Categories</h1>
+        <a href="{{ route('categories.create') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow-md">+ Add New Category</a>
+    </div>
 
-    <a href="{{ route('categories.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded mb-4 inline-block">Add New Category</a>
-
-    <table class="w-full bg-white shadow rounded-lg">
-        <thead>
-            <tr class="bg-gray-200 text-left">
-                <th class="px-4 py-2">ID</th>
-                <th class="px-4 py-2">Name</th>
-                <th class="px-4 py-2">Description</th>
-                <th class="px-4 py-2">Actions</th>
-            </tr>
-        </thead>
-        <tbody id="category-table">
-            <tr>
-                <td colspan="4" class="text-center py-4">Loading categories...</td>
-            </tr>
-        </tbody>
-    </table>
+    <div id="category-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 </div>
 @endsection
 
 @section('scripts')
 <script>
-$(document).ready(function () {
-    function loadCategories() {
-        $.ajax({
-            url: "{{ route('categories.index') }}",
-            type: "GET",
-            dataType: "json",
-            success: function (response) {
-                let categoryRows = '';
+    $(document).ready(() => {
+        const loadCategories = () => {
+            $.ajax({
+                url: "{{ route('categories.index') }}",
+                type: "GET",
+                dataType: "json",
+                success: (response) => {
+                    let categoryList = '';
 
-                if (response.categories.length === 0) {
-                    categoryRows = `<tr><td colspan="4" class="text-center py-4">No categories found.</td></tr>`;
-                } else {
-                    response.categories.forEach(function (category) {
-                        categoryRows += `
-                        <tr id="category-row-${category.id}" class="border-t">
-                            <td class="px-4 py-2">${category.id}</td>
-                            <td class="px-4 py-2 category-name">${category.name}</td>
-                            <td class="px-4 py-2 category-description">${category.description}</td>
-                            <td class="px-4 py-2">
-                                <a href="{{ url('categories') }}/${category.id}/edit" class="text-white bg-blue-500 px-2 py-1 rounded-sm id="edit-button">Edit</a>
-                                <button type="button" class="text-white bg-red-500 px-2 py-1 rounded-sm delete-button" data-id="${category.id}">Delete</button>
-                            </td>
-                        </tr>
-                        `;
+                    if (response.data.length > 0) {
+                        response.data.forEach((category) => {
+                            let categoryImage = category.image_url ? `/${category.image_url}` : '{{ asset('storage/default.jpg') }}';
+
+                            categoryList += `
+                            <div id="category-card-${category.id}" class="bg-white p-6 rounded-lg shadow-lg transform transition-transform hover:scale-105">
+                                <div class="mb-4">
+                                    <img src="${categoryImage}" alt="Category Image" class="w-full h-32 object-cover rounded-md">
+                                </div>
+                                <h2 class="text-xl font-semibold mb-2 text-gray-800">${category.name}</h2>
+                                <p class="text-gray-600 mb-4">${category.description || 'No description available.'}</p>
+                                <div class="flex justify-between items-center">
+                                    <a href="{{ url('categories') }}/${category.id}/edit" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-md shadow-md">Edit</a>
+                                    <button type="button" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md shadow-md delete-button" data-id="${category.id}">Delete</button>
+                                </div>
+                            </div>`;
+                        });
+                    } else {
+                        categoryList = `<p class="text-gray-600">No categories found.</p>`;
+                    }
+
+                    $('#category-list').html(categoryList);
+                },
+                error: () => {
+                    $('#category-list').html('<p class="text-red-500">Failed to fetch categories.</p>');
+                }
+            });
+        };
+
+        loadCategories();
+
+        $(document).on('click', '.delete-button', (e) => {
+            const categoryId = $(e.currentTarget).data('id');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'This action cannot be undone!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `{{ url('categories') }}/${categoryId}`,
+                        type: "DELETE",
+                        data: {
+                            _token: "{{ csrf_token() }}"
+                        },
+                        success: () => {
+                            $(`#category-card-${categoryId}`).fadeOut(300, function() {
+                                $(this).remove();
+                            });
+
+                            Swal.fire({
+                                title: 'Deleted!',
+                                text: 'Category has been deleted.',
+                                icon: 'success',
+                                confirmButtonText: 'OK'
+                            });
+                        },
+                        error: () => {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: 'Failed to delete category.',
+                                icon: 'error',
+                                confirmButtonText: 'OK'
+                            });
+                        }
                     });
                 }
-
-                $('#category-table').html(categoryRows);
-            },
-            error: function () {
-                $('#category-table').html('<tr><td colspan="4" class="text-center py-4 text-red-500">Failed to fetch categories.</td></tr>');
-            }
-        });
-    }
-
-    loadCategories();
-
-    $(document).on('click', '.edit-button', function () {
-    let categoryId = $(this).data('id');
-    
-    $.ajax({
-        url: "/categories/" + categoryId + "/edit",
-        type: "GET",
-        success: function (response) {
-            $('#categoryName').val(response.data.name);
-            $('#categoryDescription').val(response.data.description);
-            $('#categoryId').val(response.data.id); 
-        }
-    });
-});
-
-    $(document).on('click', '.delete-button', function () {
-        let categoryId = $(this).data('id');
-
-        Swal.fire({
-            title: 'Are you sure?',
-            text: 'This action cannot be undone!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, delete it!',
-            cancelButtonText: 'Cancel',
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.ajax({
-                    url: "{{ url('categories') }}/" + categoryId,
-                    type: "DELETE",
-                    data: {
-                        _token: "{{ csrf_token() }}"
-                    },
-                    success: function () {
-                        $(`#category-row-${categoryId}`).fadeOut(300, function () {
-                            $(this).remove();
-                        });
-
-                        Swal.fire({
-                            title: 'Deleted!',
-                            text: 'Category has been deleted.',
-                            icon: 'success',
-                            confirmButtonText: 'OK'
-                        });
-                    },
-                    error: function () {
-                        Swal.fire({
-                            title: 'Error!',
-                            text: 'Failed to delete category.',
-                            icon: 'error',
-                            confirmButtonText: 'OK'
-                        });
-                    }
-                });
-            }
+            });
         });
     });
-});
 </script>
 @endsection
