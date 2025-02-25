@@ -4,14 +4,22 @@
     <div>
         <h3 class="text-2xl pl-5 pt-2">Courses</h3>
         <br>
+        @if (auth()->user())
         @isset($category_id)
         <a href="{{ route('home') }}" class="text-blue-500 pl-5 text-lg"><= Back</a>
         @endisset
+        @else
+        <a href="/categories" class="text-blue-500 pl-5 text-lg"><= Back</a>        
+        @endif
     </div>
     <div class="text-right w-full pr-5">
+        @if (auth()->user())
         @isset($category_id)
             <a href="{{ route('courses.create', ['category_id' => $category_id]) }}" class="btn btn-primary text-xl rounded-md bg-blue-300 p-1">Create Course</a>
         @endisset
+        @else
+            
+        @endif
     </div>
 </div>
 <br>
@@ -50,13 +58,15 @@
                         <div class="p-4">
                             <h3 class="text-lg font-semibold mb-2">${course.title}</h3>
                             <p class="text-gray-600 mb-4">${course.description}</p>
-                            @isset($category_id)
+                            @if (auth()->user())
+                                @isset($category_id)
                                 <a href="/courses/${course.id}/show" class="btn btn-info text-white bg-blue-500 hover:bg-blue-700 py-1 px-3 rounded-md">Show</a>
                                 <a href="/courses/${course.id}/edit" class="btn btn-warning text-white bg-yellow-500 hover:bg-yellow-700 py-1 px-3 rounded-md">Edit</a>
                                 <button class="btn btn-danger text-white bg-red-500 hover:bg-red-700 py-1 px-3 rounded-md" onclick="deleteCourse(${course.id})">Delete</button>
-                            @else
-                                <a href="/courses/${course.id}/show" class="btn btn-info text-white bg-blue-500 hover:bg-blue-700 py-1 px-3 rounded-md">Show</a>
-                            @endisset
+                                @endisset
+                            @else 
+                                <a href="/courses/${course.id}/show" class="btn btn-info text-white bg-blue-500 hover:bg-blue-700 py-1 px-3 rounded-md">Show</a> 
+                            @endif
                         </div>
                     </div>
                 `;

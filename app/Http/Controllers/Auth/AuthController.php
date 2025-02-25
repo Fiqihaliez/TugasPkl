@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
+use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
@@ -15,7 +17,7 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|max:255',
-            'email' => 'required|email|unique:email',
+            'email' => 'required|email|unique:users,email',
             'password' => 'required|confirmed|min:8',
             'role' => 'required|in:admin,student', 
         ]);
@@ -27,12 +29,14 @@ class AuthController extends Controller
             'role' => $request->role, 
         ]);
 
+        $token = JWTAuth::fromUser($user);
         Auth::login($user);
         return redirect()->route('login'); 
 
         return response()->json([
             'message' => 'Registration successful',
             'user' => $user,
+            'token' => $token,
         ]);
     }
 
@@ -43,16 +47,20 @@ class AuthController extends Controller
             'password' => 'required|min:8',
         ]);
     
-        if (Auth::attempt($request->only('email', 'password'))) {
-            $user = Auth::user();
-    
-            
-            return redirect()->route('home'); 
+        $credentials = $request->only('email', 'password');
+
+        try {
+            if (!$token = JWTAuth::attempt($credentials)) {
+                return response()->json(['error' => 'Email atau password salah.'], 401);
+            }
+        } catch (JWTException $e) {
+            return response()->json(['error' => 'Tidak dapat membuat token.'], 500);
         }
-    
+
         return response()->json([
-            'message' => 'Invalid credentials',
-        ], 401);
+            'token' => $token,
+            'user' => Auth::user(),
+            'message' =>  'Login Successfully',
+        ],200); 
     }
-    
 }

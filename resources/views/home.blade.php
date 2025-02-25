@@ -2,7 +2,6 @@
 
 @section('content')
 <div class="container mx-auto px-4 py-8">
-    
     @auth
         <h1 class="text-2xl font-bold mb-4">Welcome, {{ Auth::user()->name }}!</h1>
     @else

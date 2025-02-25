@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+@if (auth()->user())
 <div class="container mx-auto px-4 py-8">
     <h1 class="text-2xl font-bold mb-4">Categories</h1>
 
@@ -40,8 +41,6 @@
     </table>
 </div>
 
-@endsection
-
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -69,4 +68,26 @@
         });
     @endif
 </script>
+@endsection
+
+@else
+    <div class="flex justify-between items-center">
+        <div>
+            <h3 class="text-2xl pl-5 pt-2">Categories</h3>
+            <br>
+        </div>
+    </div>
+    <br>
+
+    <div id="course-list" class="pl-5 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
+        @foreach($categories as $category)
+            <div class="category-item p-3 bg-white shadow rounded-lg overflow-hidden hover:shadow-lg transition">
+                <h3 class="text-lg font-semibold mb-2">{{ $category->name }}</h3>
+                <p class="text-gray-600 mb-4">{{ $category->description }}</p>
+                <a href="{{ route('courses.index', $category->id) }}" class="btn btn-info text-white bg-blue-500 hover:bg-blue-700 py-1 px-3 rounded-md">Start Learning</a>
+            </div>
+        @endforeach
+    </div>
+@endif
+
 @endsection

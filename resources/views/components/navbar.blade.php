@@ -5,13 +5,20 @@
             {{ request()->is('/') ? 'text-blue-500' : '' }}" ><i class="fa-solid fa-book"></i> My App</a>
         </div>
 
-        <div class="lg:pr-[450px] hidden md:flex space-x-6">
+        <div class="mr-15 lg:pr-[450px] hidden md:flex space-x-4">
+            @if (auth()->user())
             <a href="/home" class="text-gray-700 hover:text-blue-500 
-                {{ request()->is('home') ? 'text-blue-500' : '' }}"><i class="fa-solid fa-house"></i> Home</a>
-            <a href="/categories" class="text-gray-700 hover:text-blue-500 
+                {{ request()->is('home') ? 'text-blue-500' : '' }}"><i class="fa-solid fa-house"></i> Home</a>  
+                <a href="/categories" class="text-gray-700 hover:text-blue-500 
                 {{ request()->is('categories') ? 'text-blue-500' : '' }}"><i class="fa-solid fa-bars"></i> Categories</a>
+                <a href="/courses" class="text-gray-700 hover:text-blue-500 
+                {{ request()->is('courses') ? 'text-blue-500' : '' }}"><i class="fa-solid fa-file"></i> Courses</a>  
+            @else
+            <a href="/categories" class="text-gray-700 hover:text-blue-500 
+            {{ request()->is('categories') ? 'text-blue-500' : '' }}"><i class="fa-solid fa-bars"></i> Categories</a>
             <a href="/courses" class="text-gray-700 hover:text-blue-500 
-                {{ request()->is('courses') ? 'text-blue-500' : '' }}"><i class="fa-solid fa-file"></i> Courses</a>
+            {{ request()->is('courses') ? 'text-blue-500' : '' }}"><i class="fa-solid fa-file"></i> Courses</a>
+            @endif
         </div>
 
         <button class="md:hidden text-gray-700 focus:outline-none" id="mobile-menu-button" aria-label="Toggle Sidebar">
