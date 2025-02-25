@@ -20,6 +20,7 @@
     <div class="">
         @yield('content')
     </div>
+    <br>
     <footer class="w-full bg-black grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 text-center justify-center p-10 gap-10 h-fit items-center">
 
         <div class="flex gap-10 justify-center items-center mb-4 md:mb-0">
