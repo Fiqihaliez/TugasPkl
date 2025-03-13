@@ -29,9 +29,17 @@ class AuthController extends Controller
             'role' => $request->role, 
         ]);
 
-        $token = JWTAuth::fromUser($user);
-        Auth::login($user);
-        return redirect()->route('login'); 
+        $payload = [
+            'sub' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role, 
+
+        ];
+
+        $token = JWTAuth::customPayload($payload);
+
+        Auth::login($user); 
 
         return response()->json([
             'message' => 'Registration successful',
@@ -46,21 +54,33 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required|min:8',
         ]);
-    
+
         $credentials = $request->only('email', 'password');
 
-        try {
-            if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json(['error' => 'Email atau password salah.'], 401);
-            }
-        } catch (JWTException $e) {
-            return response()->json(['error' => 'Tidak dapat membuat token.'], 500);
+    try {
+        if (!$token = JWTAuth::attempt($credentials)) {
+            return response()->json(['error' => 'Email atau password salah.'], 401);
         }
+        
+        $user = Auth::user();
 
-        return response()->json([
-            'token' => $token,
-            'user' => Auth::user(),
-            'message' =>  'Login Successfully',
-        ],200); 
+        $payload = [
+            'sub' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+        ];
+
+        $token = JWTAuth::customPayload($payload);
+
+    } catch (JWTException $e) {
+        return response()->json(['error' => 'Tidak dapat membuat token.'], 500);
     }
+
+    return response()->json([
+        'token' => $token,
+        'user' => $user,
+        'message' =>  'Login Successfully',
+    ], 200); 
+}
 }
