@@ -44,29 +44,31 @@ class CategoryService
             throw $e;
         }
     }
-
     public function updateCategory(Category $category, array $data): Category
     {
         try {
-            if (isset($data['image_url']) && $data['image_url'] !== $category->image_url) {
+            if (isset($data['image_url']) && $data['image_url'] instanceof \Illuminate\Http\UploadedFile) {
                 if ($category->image_url) {
                     Storage::disk('public')->delete($category->image_url);
                 }
-                $category->image_url = $data['image_url'];
+                $filename = uniqid() . '.' . $data['image_url']->getClientOriginalExtension();
+                $data['image_url']->move(public_path('uploads/categories'), $filename);
+                $imagePath = 'uploads/categories/' . $filename;
             }
-
+    
             $category->update([
                 'name' => $data['name'],
                 'description' => $data['description'] ?? null,
-                'image_url' => $category->image_url,
+                'image_url' => $imagePath ?? $category->image_url,
             ]);
-
+    
             return $category;
         } catch (Exception $e) {
             logger()->error('Error updating category: ' . $e->getMessage());
             throw $e;
         }
     }
+    
 
     public function deleteCategory(Category $category): Category
     {

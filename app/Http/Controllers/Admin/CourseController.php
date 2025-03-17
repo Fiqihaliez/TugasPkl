@@ -23,18 +23,20 @@ class CourseController extends Controller
     
     public function create()
     {
-        return view('admin.courses.create');
-    }
-
-    public function edit(Course $course)
-    {
-        $categories = Category::all(); 
-    
-        return view('admin.courses.edit', [
-            'course' => $course,
+        $categories = Category::all();
+        return view('admin.courses.create', [
             'categories' => $categories 
         ]);
     }
+
+    public function edit($id)
+    {
+        $course = Course::findOrFail($id);
+        $categories = Category::all();
+    
+        return view('admin.courses.edit', compact('course', 'categories'));
+    }
+    
     
     public function show(Course $course)
     {

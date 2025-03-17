@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('content')
 <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-6">
@@ -18,6 +17,7 @@
             $.ajax({
                 url: "{{ route('categories.index') }}",
                 type: "GET",
+                headers: {"Authorization": "Bearer " + localStorage.getItem('authToken')},
                 dataType: "json",
                 success: (response) => {
                     let categoryList = '';
@@ -82,6 +82,7 @@
                                 icon: 'success',
                                 confirmButtonText: 'OK'
                             });
+                            loadCategories();
                         },
                         error: () => {
                             Swal.fire({

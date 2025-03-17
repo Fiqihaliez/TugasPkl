@@ -14,7 +14,7 @@
             </div>
             <div class="mb-4">
                 <label for="description" class="block text-gray-700">Description</label>
-                <textarea id="description" name="description" class="w-full border-gray-300 rounded-lg shadow-sm p-2"></textarea>
+                <textarea id="description" name="description" class="w-full border-gray-300 rounded-lg shadow-sm p-2 line-clamp-3"></textarea>
                 <p id="description-error" class="text-red-500 text-sm mt-1 hidden"></p>
             </div>
             <div class="mb-4">
@@ -46,13 +46,10 @@
                 url: "{{ route('categories.index') }}",
                 type: "GET",
                 dataType: "json",
-                headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                },
                 success: function (response) {
                     let categorySelect = $('#category_id');
                     categorySelect.empty().append('<option value="">-- Select Category --</option>');
-
+                    
                     if (response.success && response.data.length > 0) {
                         response.data.forEach(category => {
                             categorySelect.append(`<option value="${category.id}">${category.name}</option>`);
@@ -63,19 +60,15 @@
                 },
                 error: function () {
                     console.error("Failed to load categories.");
-                    $('#category_id').append('<option disabled>Error loading categories</option>');
                 }
             });
         }
 
         $('#course-form').on('submit', function (e) {
             e.preventDefault();
-
             let form = new FormData(this);
             let button = $('#submit-course');
-
             $('.text-red-500').text('').addClass('hidden');
-
             button.prop('disabled', true).text('Saving...');
 
             $.ajax({
@@ -84,9 +77,6 @@
                 data: form,
                 processData: false,
                 contentType: false,
-                headers: {
-                    'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                },
                 success: function (response) {
                     Swal.fire({
                         title: 'Success!',

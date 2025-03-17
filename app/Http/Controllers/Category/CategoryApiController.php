@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Category;
 
+
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Services\CategoryService;
@@ -14,7 +15,20 @@ class CategoryApiController extends Controller
 
     public function __construct(CategoryService $categoryService)
     {
+
         $this->categoryService = $categoryService;
+    }
+
+    public function index()
+    {
+            $categories = Category::all();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Categories loaded successfully',
+                'data' => $categories
+            ]);
+     
     }
 
     public function store(Request $request)
@@ -55,23 +69,12 @@ class CategoryApiController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string|max:1000',
-            'image_url' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:3000', 
+            'description' => 'nullable|string',
+            'image_url' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:3000',
         ]);
-
-        $data = $request->only(['name', 'description']);
-
-        if ($request->hasFile('image_url')) {
-            $filename = uniqid() . '.' . $request->image_url->getClientOriginalExtension();
-            $request->image_url->move(public_path('uploads/categories'), $filename);
-
-            $imagePath = 'uploads/categories/' . $filename;
-        }
-
-        $data['image_url'] = $imagePath;
-
-        $updatedCategory = $this->categoryService->updateCategory($category, $data);
-
+    
+        $updatedCategory = $this->categoryService->updateCategory($category, $request->all());
+    
         return response()->json([
             'success' => true,
             'message' => 'Category updated successfully.',
@@ -79,7 +82,7 @@ class CategoryApiController extends Controller
             'image_url' => $updatedCategory->image_url ? Storage::url($updatedCategory->image_url) : url('/default-category-image.jpg'),
         ]);
     }
-
+    
     public function destroy(Category $category)
     {
         if ($category->image_url) {

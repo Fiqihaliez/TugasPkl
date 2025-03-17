@@ -10,10 +10,8 @@ class CategoryController extends Controller
     public function index()
     {
         if (request()->ajax()) {
-            // Mengambil kategori
             $categories = Category::all();
-    
-            // Menambahkan status 'success' dan 'message' untuk membantu debugging di frontend
+
             return response()->json([
                 'success' => true,
                 'message' => 'Categories loaded successfully',
@@ -32,8 +30,9 @@ class CategoryController extends Controller
 
     public function edit(Category $category)
     {
-        return view('categories.edit', ['category' => $category]);
+        return view('categories.edit', compact('category'));
     }
+    
 
     public function show(Category $category)
     {

@@ -6,14 +6,17 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 
 class AuthController extends Controller
 {
     public function register(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
             'email' => 'required|email|ends_with:@gmail.com|unique:users,email',
             'password' => 'required|min:8',
             'role' => 'required',
@@ -27,36 +30,37 @@ class AuthController extends Controller
             'role.required' => 'Role harus diisi.',
         ]);
 
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
+        }
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'password' => Hash::make($request->password),
             'role' => $request->role,
         ]);
 
-        Auth::login($user);
-        return redirect()->route('login');
+        $token = JWTAuth::fromUser($user);
+
+        return response()->json([
+            'message' => 'Registrasi berhasil',
+            'token' => $token,
+            'user' => $user
+        ], 201);
     }
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email|ends_with:@gmail.com',
-            'password' => 'required|min:8',
-        ], [
-            'email.required' => 'Email harus diisi.',
-            'email.email' => 'Format email tidak valid.',
-            'email.ends_with' => 'Email harus menggunakan @gmail.com.',
-            'password.required' => 'Password harus diisi.',
-            'password.min' => 'Password minimal 8 karakter.',
-        ]);
-
-        if (Auth::attempt($request->only('email', 'password'))) {
-            return redirect()->route('home');
+        $credentials = $request->only('email', 'password');
+    
+        if (!$token = JWTAuth::attempt($credentials)) {
+            return response()->json(['error' => 'Unauthorized'], 401);
         }
-
+    
         return response()->json([
-            'message' => 'Invalid credentials',
-        ], 401);
+            'message' => 'Login successful',
+            'token' => $token
+        ]);
     }
 }

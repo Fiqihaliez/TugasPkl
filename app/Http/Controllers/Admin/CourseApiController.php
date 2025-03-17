@@ -55,16 +55,7 @@ class CourseApiController extends Controller
             'image_url' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:3000',
         ]);
 
-        $data = $request->only(['title', 'description', 'category_id']);
-
-        if ($request->hasFile('image_url')) {
-            $filename = uniqid() . '.' . $request->image_url->getClientOriginalExtension();
-            $request->image_url->move(public_path('uploads/courses'), $filename);
-            $imagePath = 'uploads/courses/' . $filename;
-            $data['image_url'] = $imagePath;
-        }
-
-        $updatedCourse = $this->courseService->updateCourse($course, $data);
+        $updatedCourse = $this->courseService->updateCourse($course, $request->all());
 
         return response()->json([
             'success' => true,

@@ -15,17 +15,14 @@
             </div>
             <div class="mb-4">
                 <label for="description" class="block text-gray-700">Description</label>
-                <textarea id="description" name="description" class="w-full border-gray-300 rounded-lg shadow-sm p-2">{{ $course->description }}</textarea>
+                <textarea id="description" name="description" class="w-full border-gray-300 rounded-lg shadow-sm p-2 line-clamp-3">{{ $course->description }}</textarea>
                 <p id="description-error" class="text-red-500 text-sm mt-1 hidden"></p>
             </div>
             <div class="mb-4">
                 <label for="category_id" class="block text-gray-700">Category</label>
                 <select id="category_id" name="category_id" class="w-full border-gray-300 rounded-lg shadow-sm p-2">
-                    <option value="">-- Select Category --</option>
-                    @foreach ($categories as $category)
-                        <option value="{{ $category->id }}" {{ $course->category_id == $category->id ? 'selected' : '' }}>
-                            {{ $category->name }}
-                        </option>
+                    @foreach($categories as $category)
+                        <option value="{{ $category->id }}" {{ $course->category_id == $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
                     @endforeach
                 </select>
                 <p id="category-error" class="text-red-500 text-sm mt-1 hidden"></p>
@@ -66,7 +63,7 @@ $(document).ready(function () {
     $('#edit-course-form').on('submit', function (e) {
         e.preventDefault();
 
-        let form = new FormData(this);
+        let form = new FormData(document.getElementById('edit-course-form'));
         let button = $('#update-course');
 
         let valid = true;
@@ -75,13 +72,6 @@ $(document).ready(function () {
             valid = false;
         } else {
             $('#title-error').addClass('hidden');
-        }
-
-        if ($('#category_id').val() === '') {
-            $('#category-error').text('Category is required').removeClass('hidden');
-            valid = false;
-        } else {
-            $('#category-error').addClass('hidden');
         }
 
         if (!valid) return;

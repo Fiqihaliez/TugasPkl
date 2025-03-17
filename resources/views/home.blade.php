@@ -24,16 +24,16 @@
     <div class="courses mt-12">
         <h2 class="text-2xl font-semibold mb-6">Kursus Kami</h2>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
- 
+            @foreach($courses as $course)
                 <div class="bg-white shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition">
-                    <img src="" alt="" class="w-full h-48 object-cover">
+                    <img src="{{ asset('storage/' . $course->image_url) }}" alt="{{ $course->title }}" class="w-full h-48 object-cover">
                     <div class="p-4">
-                        <h3 class="text-lg font-semibold mb-2"></h3>
-                        <p class="text-gray-600 mb-4"></p>
-                        <a href="" class="text-blue-500 hover:underline">Mulai Belajar</a>
+                        <h3 class="text-lg font-semibold mb-2">{{ $course->title }}</h3>
+                        <p class="text-gray-600 mb-4">{{ Str::limit($course->description, 100) }}</p>
+                        <a href="{{ route('admin.courses.show', $course->id) }}" class="text-blue-500 hover:underline">Mulai Belajar</a>
                     </div>
                 </div>
-
+            @endforeach
         </div>
     </div>
 </div>

@@ -14,7 +14,7 @@
             </div>
             <div class="mb-4">
                 <label for="description" class="block text-gray-700">Description</label>
-                <textarea id="description" name="description" class="w-full border-gray-300 rounded-lg shadow-sm p-2"></textarea>
+                <textarea id="description" name="description" class="w-full border-gray-300 rounded-lg shadow-sm p-2 line-clamp-3"></textarea>
                 <p id="description-error" class="text-red-500 text-sm mt-1 hidden"></p>
             </div>
             <div class="mb-4">
@@ -45,6 +45,7 @@
             $.ajax({
                 url: "{{ route('categories.store') }}",
                 type: "POST",
+                headers: {"Authorization": "Bearer " + localStorage.getItem('authToken')},
                 data: form,
                 processData: false,
                 contentType: false,
@@ -61,6 +62,8 @@
                 error: function (xhr) {
                     let errors = xhr.responseJSON.errors;
                     if (errors) {
+                       
+                       
                         if (errors.name) {
                             $('#name-error').text(errors.name[0]).removeClass('hidden');
                         }

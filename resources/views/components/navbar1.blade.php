@@ -20,7 +20,6 @@
                     </a>
 
                 </div>
-                <!-- Mobile menu (hidden by default) -->
                 <ul id="mobile-menu" class="md:hidden absolute left-0 top-0 bg-gray-100 shadow-md w-64 p-4 space-y-4 mt-10 -translate-x-full transition-all duration-300">
                     <li><a href="#about">Tentang Kami</a></li>
                     <li><a href="#blog">Blog</a></li>

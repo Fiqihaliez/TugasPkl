@@ -69,16 +69,15 @@
                 let form = $(this);
                 let button = $('#register-button');
 
-                // Clear error messages
                 $('#name-error, #email-error, #password-error, #role-error').text('').addClass('hidden');
 
-                // Disable button and show "Processing..." text
+
                 button.prop('disabled', true).text('Processing...');
 
                 $.ajax({
                     url: "{{ route('register') }}",
                     type: "POST",
-                    timeout: 5000,  // Set a reasonable timeout
+                    timeout: 5000, 
                     data: form.serialize(),
                     success: function (response) {
                         Swal.fire({
@@ -88,7 +87,7 @@
                             timer: 1500,
                             confirmButtonText: 'OK'
                         }).then(() => {
-                            window.location.href = "{{ route('login') }}"; // Redirect to login page after success
+                            window.location.href = "{{ route('login') }}"; 
                         });
                     },
                     error: function (xhr) {
