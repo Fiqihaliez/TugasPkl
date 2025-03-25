@@ -25,6 +25,7 @@ class CourseController extends Controller
     {
         $categories = Category::all();
         return view('admin.courses.create', [
+        
             'categories' => $categories 
         ]);
     }

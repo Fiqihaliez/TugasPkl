@@ -31,6 +31,7 @@
             <div class="flex items-center space-x-2">
                 <img src="{{ asset('img/prestasi.jpg') }}" alt="Profile Picture" class="w-8 h-8 rounded-full">
             </div>
+            <button id="logout-button" class="bg-red-500 text-white px-3 py-1 rounded text-sm">Logout</button>
         </div>
 
         <button class="md:hidden text-gray-700 focus:outline-none" id="mobile-menu-button" aria-label="Toggle Sidebar">
@@ -41,6 +42,7 @@
     </div>
 </nav>
 
+<!-- Sidebar -->
 <div id="sidebar" class="fixed top-0 left-0 w-64 h-full bg-white shadow-lg transform -translate-x-full transition-transform duration-300 ease-in-out z-50">
     <div class="px-4 py-6">
         <div class="text-lg font-semibold text-blue-500 mb-6">
@@ -51,10 +53,10 @@
             <a href="/home" class="block text-gray-700 hover:text-blue-500">Home</a>
             <a href="/categories" class="block text-gray-700 hover:text-blue-500">Categories</a>
             <a href="/courses" class="block text-gray-700 hover:text-blue-500">Courses</a>
+            <button id="logout-button-sidebar" class="w-full text-left text-red-500 hover:text-red-700 block">Logout</button>
         </div>
     </div>
 </div>
-
 
 <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40" aria-hidden="true"></div>
 <div id="search-results" class="absolute top-20 left-1/2 transform -translate-x-1/2 w-full max-w-md bg-white shadow-lg rounded-lg hidden z-50">
@@ -111,4 +113,34 @@
         document.getElementById("sidebar").classList.add("-translate-x-full");
         document.getElementById("overlay").classList.add("hidden");
     });
+
+    async function logout() {
+        try {
+            const token = localStorage.getItem('authToken');
+
+            const response = await fetch("{{ route('logout') }}", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + token,
+                    "X-CSRF-TOKEN": document.querySelector("meta[name='csrf-token']").getAttribute('content')
+                },
+                data: {
+                    _token: "{{ csrf_token() }}"
+                },
+
+            });
+
+            if (response.ok) {
+                localStorage.removeItem('authToken'); 
+                window.location.href = "{{ route('login') }}";
+            } else {
+                alert("Logout gagal, coba lagi.");
+            }
+        } catch (error) {
+            console.error("Error saat logout:", error);
+        }
+    }
+
+    document.getElementById("logout-button").addEventListener("click", logout);
+    document.getElementById("logout-button-sidebar").addEventListener("click", logout);
 </script>

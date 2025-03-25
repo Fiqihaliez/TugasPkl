@@ -45,6 +45,7 @@
             $.ajax({
                 url: "{{ route('categories.index') }}",
                 type: "GET",
+                headers: {"Authorization": "Bearer " + localStorage.getItem('authToken')},
                 dataType: "json",
                 success: function (response) {
                     let categorySelect = $('#category_id');
@@ -74,6 +75,7 @@
             $.ajax({
                 url: "{{ route('admin.courses.store') }}",
                 type: "POST",
+                headers: {"Authorization": "Bearer " + localStorage.getItem('authToken')},
                 data: form,
                 processData: false,
                 contentType: false,

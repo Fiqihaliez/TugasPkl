@@ -20,6 +20,9 @@
             $.ajax({
                 url: "{{ route('admin.courses.index') }}",
                 type: "GET",
+                data: {
+                    _token: "{{ csrf_token() }}"
+                },
                 dataType: "json",
                 success: (response) => {
                     let courseList = '';

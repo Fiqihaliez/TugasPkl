@@ -74,6 +74,7 @@
             $.ajax({
                 url: "{{ route('admin.courses.store') }}",
                 type: "POST",
+                headers: {"Authorization": "Bearer " + localStorage.getItem('authToken')},
                 data: form,
                 processData: false,
                 contentType: false,

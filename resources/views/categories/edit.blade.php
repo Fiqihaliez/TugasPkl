@@ -72,6 +72,7 @@ $(document).ready(function () {
         $.ajax({
             url: "{{ route('categories.update', $category->id) }}",
             type: "POST",
+            headers: {"Authorization": "Bearer " + localStorage.getItem('authToken')},
             data: form,
             processData: false,
             contentType: false,
