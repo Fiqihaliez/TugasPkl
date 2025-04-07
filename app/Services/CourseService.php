@@ -3,76 +3,91 @@
 namespace App\Services;
 
 use App\Models\Course;
-use App\Models\Category;
 use Exception;
+use Illuminate\Support\Facades\Storage;
 
 class CourseService
 {
-    public function getCourses($search = '', $category_id = null, $limit = null)
+    public function getAllCourses(?string $search = null, int $limit = 10)
     {
         try {
-            $query = Course::query();
-
-            if ($category_id) {
-                $query->where('category_id', $category_id);
-            }
-
-            if ($search) {
-                $query->where('title', 'like', '%' . $search . '%');
-            }
-
-            if ($limit) {
-                $query->limit($limit);
-            }
-
-            return $query->orderBy('title')->get();
+            return Course::when($search, function ($query, $search) {
+                return $query->where('title', 'like', "%{$search}%")
+                             ->orWhere('description', 'like', "%{$search}%");
+            })->limit($limit)->get();
         } catch (Exception $e) {
-            throw new Exception('Terjadi kesalahan saat mengambil kursus: ' . $e->getMessage());
+            logger()->error('Error fetching courses: ' . $e->getMessage());
+            throw $e;
         }
     }
 
-    public function createCourse($data)
-    {
-        try {
-            $course = new Course;
-            $course->title = $data['title'];
-            $course->category_id = $data['category_id'];
-            $course->description = $data['description'];
-            $course->save();
-
-            return $course;
-        } catch (Exception $e) {
-            throw new Exception('Terjadi kesalahan saat membuat kursus: ' . $e->getMessage());
-        }
-    }
-
-    public function updateCourse($id, $data)
+    public function getCourseDetail(int $id): Course
     {
         try {
             $course = Course::findOrFail($id);
-            $course->title = $data['title'];
-            $course->category_id = $data['category_id'];
-            $course->description = $data['description'];
-            $course->save();
-
+            $course->image_url = asset('storage/' . $course->image_url); 
             return $course;
         } catch (Exception $e) {
-            throw new Exception('Terjadi kesalahan saat memperbarui kursus: ' . $e->getMessage());
+            logger()->error('Course not found: ' . $e->getMessage());
+            throw $e;
         }
     }
-       
-    public function deleteCourse($id)
+    
+
+    public function createCourse(array $data): Course
     {
         try {
-            $course = Course::find($id);
-            if ($course) {
-                $course->delete();
-                return true;
+            return Course::create([
+                'title' => $data['title'],
+                'description' => $data['description'] ?? null,
+                'image_url' => $data['image_url'] ?? null,
+                'category_id' => $data['category_id'] ?? null,
+            ]);
+        } catch (Exception $e) {
+            logger()->error('Error creating course: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    public function updateCourse(Course $course, array $data): Course
+    {
+        try {
+            if (isset($data['image_url']) && $data['image_url'] instanceof \Illuminate\Http\UploadedFile) {
+                if ($course->image_url) {
+                    Storage::disk('public')->delete($course->image_url);
+                }
+                $filename = uniqid() . '.' . $data['image_url']->getClientOriginalExtension();
+                $data['image_url']->move(public_path('uploads/courses'), $filename);
+                $imagePath = 'uploads/courses/' . $filename;
+            }
+            
+    
+            $course->update([
+                'title' => $data['title'],         
+                'description' => $data['description'] ?? null,
+                'category_id' => $data['category_id'],
+                'image_url' => $imagePath ?? $course->image_url,
+            ]);
+    
+            return $course;
+        } catch (Exception $e) {
+            logger()->error('Error updating course: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    
+
+    public function deleteCourse(Course $course): bool
+    {
+        try {
+            if ($course->image_url) {
+                Storage::disk('public')->delete($course->image_url);
             }
 
-            return false;
+            return $course->delete();
         } catch (Exception $e) {
-            throw new Exception('Terjadi kesalahan saat menghapus kursus: ' . $e->getMessage());
+            logger()->error('Error deleting course: ' . $e->getMessage());
+            throw $e;
         }
     }
 }

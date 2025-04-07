@@ -100,6 +100,9 @@
                 $.ajax({
                     url: '/api/courses/' + courseId, 
                     type: 'DELETE',
+                    data: {
+                        _token: "{{ csrf_token() }}"
+                    },
                     success: function(response) {
                         if (response.message === 'Course deleted successfully.') {
                             Swal.fire({

@@ -9,22 +9,33 @@ class CategoryController extends Controller
 {
     public function index()
     {
-        $data['categories'] = Category::all();
-        return view('categories.index', $data);
-    }
+        if (request()->ajax()) {
+            $categories = Category::all();
 
+            return response()->json([
+                'success' => true,
+                'message' => 'Categories loaded successfully',
+                'data' => $categories
+            ]);
+        }
+    
+        return view('categories.index');
+    }
+    
+    
     public function create()
     {
         return view('categories.create');
     }
 
+    public function edit(Category $category)
+    {
+        return view('categories.edit', compact('category'));
+    }
+    
+
     public function show(Category $category)
     {
         return view('categories.show', ['category' => $category]);
-    }
-
-    public function edit(Category $category)
-    {
-        return view('categories.edit', ['category' => $category]);
     }
 }

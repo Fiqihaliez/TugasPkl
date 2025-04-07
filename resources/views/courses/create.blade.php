@@ -1,60 +1,123 @@
 @extends('layouts.app')
-@section('content')
-<h1 class="text-4xl">Create Course</h1>
-<br>
-<form id="create-course-form" class="w-full h-full">
-    <select id="category_id" name="category_id" class="border border-gray-300 rounded-md" required>
-        <option value="">Select a Category</option>
-        @foreach($categories as $category)
-            <option value="{{ $category->id }}">
-                {{ $category->name }}
-            </option>
-        @endforeach
-    </select><br><br>
-    <label for="title">Title:</label><br>
-    <input type="text" id="title" name="title" class="border border-gray-300 rounded-md" required><br><br>
-    <label for="description">Description:</label><br>
-    <textarea id="description" name="description" class="w-full h-32 border border-gray-300 rounded-md"></textarea><br><br>
-    <button type="submit" class="bg-green-300 text-lg p-2">Create Course</button>
-</form>
 
+@section('content')
+<div class="container mx-auto px-4 py-8 flex justify-center">
+    <div class="w-full max-w-md bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold mb-4 text-center">Add New Course</h1>
+
+        <form id="course-form" enctype="multipart/form-data">
+            @csrf
+            <div class="mb-4">
+                <label for="name" class="block text-gray-700">Name</label>
+                <input type="text" id="name" name="name" class="w-full border-gray-300 rounded-lg shadow-sm p-2">
+                <p id="name-error" class="text-red-500 text-sm mt-1 hidden"></p>
+            </div>
+            <div class="mb-4">
+                <label for="description" class="block text-gray-700">Description</label>
+                <textarea id="description" name="description" class="w-full border-gray-300 rounded-lg shadow-sm p-2"></textarea>
+                <p id="description-error" class="text-red-500 text-sm mt-1 hidden"></p>
+            </div>
+            <div class="mb-4">
+                <label for="category_id" class="block text-gray-700">Category</label>
+                <select id="category_id" name="category_id" class="w-full border-gray-300 rounded-lg shadow-sm p-2">
+                    <option value="">-- Select Category --</option>
+                </select>
+                <p id="category-error" class="text-red-500 text-sm mt-1 hidden"></p>
+            </div>
+            <div class="mb-4">
+                <label for="image" class="block text-gray-700">Image</label>
+                <input type="file" id="image" name="image_url" accept="image/*" class="w-full border-gray-300 rounded-lg shadow-sm p-2">
+                <p id="image-error" class="text-red-500 text-sm mt-1 hidden"></p>
+            </div>
+            <button type="submit" id="submit-course" class="w-full bg-blue-500 text-white px-4 py-2 rounded">Save</button>
+        </form>
+        <a href="{{ route('admin.courses.index') }}" class="block text-center mt-4 text-blue-500">Back to Courses</a>
+    </div>
+</div>
+@endsection
+
+@section('scripts')
 <script>
-    $.ajaxSetup({
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    $(document).ready(function () {
+        loadCategories();
+
+        function loadCategories() {
+            $.ajax({
+                url: "{{ route('categories.index') }}",
+                type: "GET",
+                headers: {"Authorization": "Bearer " + localStorage.getItem('authToken')},
+                dataType: "json",
+                success: function (response) {
+                    let categorySelect = $('#category_id');
+                    categorySelect.empty().append('<option value="">-- Select Category --</option>');
+                    
+                    if (response.data && response.data.length > 0) {
+                        response.data.forEach(category => {
+                            categorySelect.append(`<option value="${category.id}">${category.name}</option>`);
+                        });
+                    } else {
+                        categorySelect.append('<option disabled>No categories available</option>');
+                    }
+                },
+                error: function () {
+                    console.error("Failed to load categories.");
+                }
+            });
         }
-    });
-    $('#create-course-form').on('submit', function(e) {
-        e.preventDefault();
-        var formData = {
-            title: $('#title').val(),
-            category_id: $('#category_id').val(), 
-            description: $('#description').val()
-        };
-        $.ajax({
-            url: '{{ route('api.courses.store')}}', 
-            type: 'POST',
-            data: formData,
-            success: function(response) {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Kursus Berhasil Dibuat!',
-                    text: response.message,
-                    confirmButtonText: 'OK'
-                }).then(() => {
-                    $('#create-course-form')[0].reset();  
-                });
-            },
-            error: function(xhr, status, error) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Terjadi Kesalahan',
-                    text: 'Gagal membuat kursus. Coba lagi.',
-                    confirmButtonText: 'OK'
-                });
-            }
+
+        $('#course-form').on('submit', function (e) {
+            e.preventDefault();
+            let form = new FormData(this);
+            let button = $('#submit-course');
+            $('.text-red-500').text('').addClass('hidden');
+            button.prop('disabled', true).text('Saving...');
+
+            $.ajax({
+                url: "{{ route('admin.courses.store') }}",
+                type: "POST",
+                headers: {"Authorization": "Bearer " + localStorage.getItem('authToken')},
+                data: form,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    Swal.fire({
+                        title: 'Success!',
+                        text: 'Course added successfully!',
+                        icon: 'success',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = "{{ route('admin.courses.index') }}";
+                    });
+                },
+                error: function (xhr) {
+                    let errors = xhr.responseJSON?.errors;
+                    if (errors) {
+                        if (errors.name) {
+                            $('#name-error').text(errors.name[0]).removeClass('hidden');
+                        }
+                        if (errors.description) {
+                            $('#description-error').text(errors.description[0]).removeClass('hidden');
+                        }
+                        if (errors.category_id) {
+                            $('#category-error').text(errors.category_id[0]).removeClass('hidden');
+                        }
+                        if (errors.image_url) {
+                            $('#image-error').text(errors.image_url[0]).removeClass('hidden');
+                        }
+                    } else {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: 'Something went wrong. Please try again.',
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                },
+                complete: function () {
+                    button.prop('disabled', false).text('Save');
+                }
+            });
         });
     });
 </script>
 @endsection
-    
